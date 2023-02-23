@@ -32,7 +32,7 @@ public class NotaController {
         return notaService.findById(id);
     }
 
-    @GetMapping("/titulo/{titulo}")
+    @GetMapping("/titulo")
     public List<Nota> findNotaTitulo(@RequestParam("titulo") String titulo){
         List<Nota> notas = notaService.findAll();
         List<Nota> notasEncontradas = new ArrayList<Nota>();
