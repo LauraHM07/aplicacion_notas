@@ -22,17 +22,34 @@ public class NotaController {
     @Autowired
     NotaService notaService;
 
-    @GetMapping("/notas")
+    @GetMapping("/lista")
     List<Nota> all(){
         return notaService.findAll();
     }
+
+    @PostMapping("/nueva")
+    Nota crearNota(@RequestBody Nota nota){
+        notaService.save(nota);
+        return nota;
+    }
+
+    @DeleteMapping("/borrar/{id}")
+    void deleteNota(@PathVariable int id){
+        notaService.deleteById(id);
+    }
+
     
-    @GetMapping("/notas/{id}")
+    @PutMapping("/editar/{id}")
+    void modificarNota(@PathVariable int id, @RequestBody Nota nota){
+        notaService.update(id, nota);
+    }
+
+    @GetMapping("/buscar/{id}")
     Nota findNota(@PathVariable int id){
         return notaService.findById(id);
     }
 
-    @GetMapping("/titulo")
+    @GetMapping("/buscar/titulo")
     public List<Nota> findNotaTitulo(@RequestParam("titulo") String titulo){
         List<Nota> notas = notaService.findAll();
         List<Nota> notasEncontradas = new ArrayList<Nota>();
@@ -44,21 +61,5 @@ public class NotaController {
         }
 
         return notasEncontradas;
-    }
-
-    @DeleteMapping("/notas/{id}")
-    void deleteNota(@PathVariable int id){
-        notaService.deleteById(id);
-    }
-
-    @PostMapping("/notas")
-    Nota crearNota(@RequestBody Nota nota){
-        notaService.save(nota);
-        return nota;
-    }
-
-    @PutMapping("/notas/{id}")
-    void modificarNota(@PathVariable int id, @RequestBody Nota nota){
-        notaService.update(id, nota);
     }
 }
