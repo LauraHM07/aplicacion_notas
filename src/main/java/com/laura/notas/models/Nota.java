@@ -2,21 +2,35 @@ package com.laura.notas.models;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Nota {
     @Id
     @GeneratedValue
     private int id;
-    
+
+    @Column(length = 100, nullable = false)
     private String titulo;
 
+    @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-mm-dd")
     private Date fecha;
 
+    @Column(length = 1000, nullable = false)
     private String descripcion;
+
+    public Nota() {
+    }
+
+    public Nota(int id) {
+        this.id = id;
+    }
 
     public int getId() {
         return id;
