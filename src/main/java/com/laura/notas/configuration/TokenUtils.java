@@ -13,15 +13,15 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 public class TokenUtils {
-
-    private final static String ACCESS_TOKEN_SECRET = "AJBDAKJDFNKJSNOAIHFISGFIGFHJBIDKGHLNOLDGN";
-    private final static long ACCESS_VALIDATY_SECONDS = 120;
+    private final static String ACCESS_TOKEN_SECRET = "QWENASIOUD23MN4089ASDF2349ASJKD239084A890KVKSDJLF90239084";
+    private final static long ACCESS_VALIDITY_SECONDS = 120;
 
     public static String createToken(String nombre, String username) {
 
-        long expirationTime = ACCESS_VALIDATY_SECONDS * 1000;
-        long timeInMillis = GregorianCalendar.getInstance().getTimeInMillis();
-        Date expirationDate = new Date(timeInMillis + expirationTime);
+        long expirationTimeInMillis = ACCESS_VALIDITY_SECONDS * 1000;
+        long currentTimeInMillis = GregorianCalendar.getInstance().getTimeInMillis();
+
+        Date expirationDate = new Date(currentTimeInMillis + expirationTimeInMillis);
 
         Map<String, Object> extra = new HashMap<String, Object>();
         extra.put("nombre", nombre);
@@ -37,15 +37,13 @@ public class TokenUtils {
     }
 
     public static UsernamePasswordAuthenticationToken gAuthenticationToken(String token) {
-
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(ACCESS_TOKEN_SECRET.getBytes())
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
 
         String username = claims.getSubject();
-
         return new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
     }
 }

@@ -22,7 +22,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-
         JWTAuthenticationFilter authenticationFilter = new JWTAuthenticationFilter();
         authenticationFilter.setAuthenticationManager(authManager);
         authenticationFilter.setFilterProcessesUrl("/login");
@@ -33,13 +32,11 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .httpBasic()
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(authenticationFilter)
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
