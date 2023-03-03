@@ -7,27 +7,26 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import com.laura.notas.models.Nota;
 import com.laura.notas.repositories.NotaRepository;
 import com.laura.notas.services.NotaService;
 
 @Service
 public class NotaServiceImpl implements NotaService {
-    
+
     @Autowired
     NotaRepository notaRepository;
 
     @Override
     public List<Nota> findAll() {
-        
+
         return notaRepository.findAll();
     }
 
     @Override
     public Nota findById(int id) {
         Optional<Nota> findById = notaRepository.findById(id);
-        if(findById != null){
+        if (findById != null) {
             return findById.get();
         }
         return null;
@@ -48,7 +47,7 @@ public class NotaServiceImpl implements NotaService {
     @Override
     public void deleteById(int id) {
         notaRepository.deleteById(id);
-        
+
     }
 
     @Override

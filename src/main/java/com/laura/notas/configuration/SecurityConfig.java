@@ -1,74 +1,65 @@
 package com.laura.notas.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import com.laura.notas.services.UsuariosService;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class SecurityConfig extends GlobalMethodSecurityConfiguration {
+public class SecurityConfig {
+
+    @Autowired
+    JWTAuthorizationFilter authorizationFilter;
 
     @Bean
-    UsuariosService myUserService(){
-        return new UsuariosService();
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
+
+        JWTAuthenticationFilter authenticationFilter = new JWTAuthenticationFilter();
+        authenticationFilter.setAuthenticationManager(authManager);
+        authenticationFilter.setFilterProcessesUrl("/login");
+
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .httpBasic()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(authenticationFilter)
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
-    
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
-    public UserDetailsService user(){
-
-        UserDetails user = User.builder()
-            .username("user")
-            .password("{noop}user*1234")
-            .authorities("USER")
-            .build();
-
-        UserDetails admin = User.builder()
-            .username("admin")
-            .password("{noop}admin*1234")
-            .authorities("USER","ADMIN")
-            .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
+    UsuariosService myUserService() {
+        return new UsuariosService();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider autProvider = new DaoAuthenticationProvider();
-
-        autProvider.setUserDetailsService(myUserService());
-        autProvider.setPasswordEncoder(passwordEncoder());
-
-        return autProvider;
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        
-        http
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated()
-        .and()
-            .formLogin()
-        .and()
-            .httpBasic();
-        
-        return http.build();
+    AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(myUserService())
+                .passwordEncoder(passwordEncoder())
+                .and()
+                .build();
     }
 }

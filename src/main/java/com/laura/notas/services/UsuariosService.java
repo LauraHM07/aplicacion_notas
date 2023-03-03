@@ -17,7 +17,7 @@ import com.laura.notas.repositories.UsuarioRepository;
 
 @Service
 public class UsuariosService implements UserDetailsService {
-    
+
     @Autowired
     private UsuarioRepository userRepository;
 
@@ -49,16 +49,16 @@ public class UsuariosService implements UserDetailsService {
         List<Permiso> permisosUsuario = usuario.getPermissions();
         List<GrantedAuthority> permisos = new ArrayList<GrantedAuthority>();
 
-        for (Permiso permiso : permisosUsuario){
+        for (Permiso permiso : permisosUsuario) {
             permisos.add(new SimpleGrantedAuthority(permiso.getNombre()));
         }
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-            .username(usuario.getNombre())
-            .password(usuario.getPassword())
-            .authorities(permisos)
-            .build();
-        
+                .username(usuario.getNombre())
+                .password(usuario.getPassword())
+                .authorities(permisos)
+                .build();
+
         return userDetails;
     }
 }
